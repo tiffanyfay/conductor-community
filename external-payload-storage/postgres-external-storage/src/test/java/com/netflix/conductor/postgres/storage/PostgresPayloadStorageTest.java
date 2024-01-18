@@ -24,12 +24,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -40,8 +42,8 @@ import com.netflix.conductor.common.config.TestObjectMapperConfiguration;
 import com.netflix.conductor.common.utils.ExternalPayloadStorage;
 import com.netflix.conductor.core.utils.IDGenerator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @ContextConfiguration(classes = {TestObjectMapperConfiguration.class})
 @RunWith(SpringRunner.class)
@@ -63,8 +65,8 @@ public class PostgresPayloadStorageTest {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         postgreSQLContainer =
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres"))
                         .withDatabaseName("conductor");
@@ -79,7 +81,7 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testWriteInputStreamToDb() throws IOException, SQLException {
+    void writeInputStreamToDb() throws IOException, SQLException {
         executionPostgres.upload(key, inputData, inputData.available());
 
         PreparedStatement stmt =
@@ -96,7 +98,7 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testReadInputStreamFromDb() throws IOException, SQLException {
+    void readInputStreamFromDb() throws IOException, SQLException {
         insertData();
         assertEquals(
                 inputString,
@@ -114,9 +116,10 @@ public class PostgresPayloadStorageTest {
         stmt.executeUpdate();
     }
 
-    @Test(timeout = 60 * 1000)
-    public void testMultithreadDownload()
-            throws ExecutionException, InterruptedException, SQLException, IOException {
+    @Test
+    @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS)
+    void multithreadDownload()
+                    throws ExecutionException, InterruptedException, SQLException, IOException {
         AtomicInteger threadCounter = new AtomicInteger(0);
         insertData();
         int numberOfThread = 12;
@@ -159,7 +162,7 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testReadNonExistentInputStreamFromDb() throws IOException, SQLException {
+    void readNonExistentInputStreamFromDb() throws IOException, SQLException {
         PreparedStatement stmt =
                 testPostgres
                         .getDataSource()
@@ -177,7 +180,7 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testMaxRowInTable() throws IOException, SQLException {
+    void maxRowInTable() throws IOException, SQLException {
         executionPostgres.upload(key, inputData, inputData.available());
         executionPostgres.upload("dummyKey2.json", inputData, inputData.available());
         executionPostgres.upload("dummyKey3.json", inputData, inputData.available());
@@ -189,9 +192,10 @@ public class PostgresPayloadStorageTest {
         assertCount(5);
     }
 
-    @Test(timeout = 60 * 1000)
-    public void testMultithreadInsert()
-            throws SQLException, ExecutionException, InterruptedException {
+    @Test
+    @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS)
+    void multithreadInsert()
+                    throws SQLException, ExecutionException, InterruptedException {
         AtomicInteger threadCounter = new AtomicInteger(0);
         int numberOfThread = 12;
         int taskInThread = 100;
@@ -229,8 +233,8 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testHashEnsuringNoDuplicates()
-            throws IOException, SQLException, InterruptedException {
+    void hashEnsuringNoDuplicates()
+                    throws IOException, SQLException, InterruptedException {
         final String createdOn = uploadData();
         Thread.sleep(500);
         final String createdOnAfterUpdate = uploadData();
@@ -247,7 +251,7 @@ public class PostgresPayloadStorageTest {
     }
 
     @Test
-    public void testDistinctHashedKey() {
+    void distinctHashedKey() {
         final String location = getKey(inputString);
         final String location2 = getKey(inputString);
         final String location3 = getKey(inputString + "A");
@@ -292,8 +296,8 @@ public class PostgresPayloadStorageTest {
         }
     }
 
-    @After
-    public void teardown() throws SQLException {
+    @AfterEach
+    void teardown() throws SQLException {
         testPostgres.getDataSource().getConnection().close();
     }
 }

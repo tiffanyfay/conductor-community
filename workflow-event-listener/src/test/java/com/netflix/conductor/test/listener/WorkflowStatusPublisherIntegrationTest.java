@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,19 +45,18 @@ import com.netflix.conductor.service.WorkflowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.netflix.conductor.common.metadata.tasks.Task.Status.COMPLETED;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        properties = {
-            "conductor.workflow-status-listener.type=queue_publisher",
-            "conductor.workflow-status-listener.queue-publisher.successQueue=dummy",
-            "conductor.workflow-status-listener.queue-publisher.failureQueue=dummy",
-            "conductor.workflow-status-listener.queue-publisher.finalizeQueue=final"
-        })
+                properties = {
+                                "conductor.workflow-status-listener.type=queue_publisher",
+                                "conductor.workflow-status-listener.queue-publisher.successQueue=dummy",
+                                "conductor.workflow-status-listener.queue-publisher.failureQueue=dummy",
+                                "conductor.workflow-status-listener.queue-publisher.finalizeQueue=final"
+                })
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
-public class WorkflowStatusPublisherIntegrationTest {
+class WorkflowStatusPublisherIntegrationTest {
 
     private final String CALLBACK_QUEUE = "dummy";
     private final String FINALIZED_QUEUE = "final";
@@ -76,8 +75,8 @@ public class WorkflowStatusPublisherIntegrationTest {
 
     @Autowired protected WorkflowService workflowExecutor;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         TaskDef taskDef = new TaskDef();
         taskDef.setName("junit_task_1");
         taskDef.setTimeoutSeconds(120);
@@ -87,8 +86,8 @@ public class WorkflowStatusPublisherIntegrationTest {
         metadataService.registerTaskDef(Collections.singletonList(taskDef));
     }
 
-    @After
-    public void cleanUp() {
+    @AfterEach
+    void cleanUp() {
         List<String> workflows =
                 metadataService.getWorkflowDefs().stream()
                         .map(WorkflowDef::getName)
@@ -104,7 +103,7 @@ public class WorkflowStatusPublisherIntegrationTest {
     }
 
     @Test
-    public void testListenerOnTerminatedWorkflow() throws IOException {
+    void listenerOnTerminatedWorkflow() throws IOException {
         String id =
                 startOrLoadWorkflowExecution(
                         LINEAR_WORKFLOW_T1_T2,
@@ -138,7 +137,7 @@ public class WorkflowStatusPublisherIntegrationTest {
     }
 
     @Test
-    public void testListenerOnCompletedWorkflow() throws IOException, InterruptedException {
+    void listenerOnCompletedWorkflow() throws IOException, InterruptedException {
         WorkflowDef workflowDef = new WorkflowDef();
         workflowDef.setName(LINEAR_WORKFLOW_T1_T2);
         workflowDef.setDescription(workflowDef.getName());

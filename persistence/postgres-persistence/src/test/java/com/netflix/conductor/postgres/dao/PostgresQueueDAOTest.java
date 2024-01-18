@@ -11,20 +11,21 @@
  */
 package com.netflix.conductor.postgres.dao;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +44,11 @@ import com.netflix.conductor.postgres.util.Query;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @ContextConfiguration(
         classes = {
@@ -69,19 +70,23 @@ public class PostgresQueueDAOTest {
 
     @Autowired private ObjectMapper objectMapper;
 
-    @Rule public TestName name = new TestName();
+     public String name;
 
     @Autowired Flyway flyway;
 
     // clean the database between tests.
-    @Before
-    public void before() {
+    @BeforeEach
+    void before(TestInfo testInfo) {
+        Optional<Method> testMethod = testInfo.getTestMethod();
+        if (testMethod.isPresent()) {
+            this.name = testMethod.get().getName();
+        }
         flyway.clean();
         flyway.migrate();
     }
 
     @Test
-    public void complexQueueTest() {
+    void complexQueueTest() {
         String queueName = "TestQueue";
         long offsetTimeInSecond = 0;
 
@@ -155,7 +160,7 @@ public class PostgresQueueDAOTest {
      * @since 1.8.2-rc5
      */
     @Test
-    public void pollMessagesTest() {
+    void pollMessagesTest() {
         final List<Message> messages = new ArrayList<>();
         final String queueName = "issue399_testQueue";
         final int totalSize = 10;
@@ -174,28 +179,28 @@ public class PostgresQueueDAOTest {
         queueDAO.push(queueName, ImmutableList.copyOf(messages));
 
         // Assert that all messages were persisted and no extras are in there
-        assertEquals("Queue size mismatch", totalSize, queueDAO.getSize(queueName));
+        assertEquals(totalSize, queueDAO.getSize(queueName), "Queue size mismatch");
 
         List<Message> zeroPoll = queueDAO.pollMessages(queueName, 0, 10_000);
-        assertTrue("Zero poll should be empty", zeroPoll.isEmpty());
+        assertTrue(zeroPoll.isEmpty(), "Zero poll should be empty");
 
         final int firstPollSize = 3;
         List<Message> firstPoll = queueDAO.pollMessages(queueName, firstPollSize, 10_000);
-        assertNotNull("First poll was null", firstPoll);
-        assertFalse("First poll was empty", firstPoll.isEmpty());
-        assertEquals("First poll size mismatch", firstPollSize, firstPoll.size());
+        assertNotNull(firstPoll, "First poll was null");
+        assertFalse(firstPoll.isEmpty(), "First poll was empty");
+        assertEquals(firstPollSize, firstPoll.size(), "First poll size mismatch");
 
         final int secondPollSize = 4;
         List<Message> secondPoll = queueDAO.pollMessages(queueName, secondPollSize, 10_000);
-        assertNotNull("Second poll was null", secondPoll);
-        assertFalse("Second poll was empty", secondPoll.isEmpty());
-        assertEquals("Second poll size mismatch", secondPollSize, secondPoll.size());
+        assertNotNull(secondPoll, "Second poll was null");
+        assertFalse(secondPoll.isEmpty(), "Second poll was empty");
+        assertEquals(secondPollSize, secondPoll.size(), "Second poll size mismatch");
 
         // Assert that the total queue size hasn't changed
         assertEquals(
-                "Total queue size should have remained the same",
                 totalSize,
-                queueDAO.getSize(queueName));
+                queueDAO.getSize(queueName),
+                "Total queue size should have remained the same");
 
         // Assert that our un-popped messages match our expected size
         final long expectedSize = totalSize - firstPollSize - secondPollSize;
@@ -204,7 +209,7 @@ public class PostgresQueueDAOTest {
                     "SELECT COUNT(*) FROM queue_message WHERE queue_name = ? AND popped = false";
             try (Query q = new Query(objectMapper, c, UNPOPPED)) {
                 long count = q.addParameter(queueName).executeCount();
-                assertEquals("Remaining queue size mismatch", expectedSize, count);
+                assertEquals(expectedSize, count, "Remaining queue size mismatch");
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -213,7 +218,7 @@ public class PostgresQueueDAOTest {
 
     /** Test fix for https://github.com/Netflix/conductor/issues/1892 */
     @Test
-    public void containsMessageTest() {
+    void containsMessageTest() {
         String queueName = "TestQueue";
         long offsetTimeInSecond = 0;
 
@@ -241,7 +246,7 @@ public class PostgresQueueDAOTest {
      * @since 1.8.2-rc5
      */
     @Test
-    public void pollDeferredMessagesTest() throws InterruptedException {
+    void pollDeferredMessagesTest() throws InterruptedException {
         final List<Message> messages = new ArrayList<>();
         final String queueName = "issue448_testQueue";
         final int totalSize = 10;
@@ -268,13 +273,13 @@ public class PostgresQueueDAOTest {
         }
 
         // Assert that all messages were persisted and no extras are in there
-        assertEquals("Queue size mismatch", totalSize, queueDAO.getSize(queueName));
+        assertEquals(totalSize, queueDAO.getSize(queueName), "Queue size mismatch");
 
         final int firstPollSize = 4;
         List<Message> firstPoll = queueDAO.pollMessages(queueName, firstPollSize, 100);
-        assertNotNull("First poll was null", firstPoll);
-        assertFalse("First poll was empty", firstPoll.isEmpty());
-        assertEquals("First poll size mismatch", firstPollSize, firstPoll.size());
+        assertNotNull(firstPoll, "First poll was null");
+        assertFalse(firstPoll.isEmpty(), "First poll was empty");
+        assertEquals(firstPollSize, firstPoll.size(), "First poll size mismatch");
 
         List<String> firstPollMessageIds =
                 messages.stream()
@@ -284,7 +289,7 @@ public class PostgresQueueDAOTest {
 
         for (int i = 0; i < firstPollSize; i++) {
             String actual = firstPoll.get(i).getId();
-            assertTrue("Unexpected Id: " + actual, firstPollMessageIds.contains(actual));
+            assertTrue(firstPollMessageIds.contains(actual), "Unexpected Id: " + actual);
         }
 
         final int secondPollSize = 3;
@@ -295,21 +300,21 @@ public class PostgresQueueDAOTest {
 
         // Poll for many more messages than expected
         List<Message> secondPoll = queueDAO.pollMessages(queueName, secondPollSize + 10, 100);
-        assertNotNull("Second poll was null", secondPoll);
-        assertFalse("Second poll was empty", secondPoll.isEmpty());
-        assertEquals("Second poll size mismatch", secondPollSize, secondPoll.size());
+        assertNotNull(secondPoll, "Second poll was null");
+        assertFalse(secondPoll.isEmpty(), "Second poll was empty");
+        assertEquals(secondPollSize, secondPoll.size(), "Second poll size mismatch");
 
         List<String> expectedIds = Arrays.asList("testmsg-4", "testmsg-6", "testmsg-7");
         for (int i = 0; i < secondPollSize; i++) {
             String actual = secondPoll.get(i).getId();
-            assertTrue("Unexpected Id: " + actual, expectedIds.contains(actual));
+            assertTrue(expectedIds.contains(actual), "Unexpected Id: " + actual);
         }
 
         // Assert that the total queue size hasn't changed
         assertEquals(
-                "Total queue size should have remained the same",
                 totalSize,
-                queueDAO.getSize(queueName));
+                queueDAO.getSize(queueName),
+                "Total queue size should have remained the same");
 
         // Assert that our un-popped messages match our expected size
         final long expectedSize = totalSize - firstPollSize - secondPollSize;
@@ -318,7 +323,7 @@ public class PostgresQueueDAOTest {
                     "SELECT COUNT(*) FROM queue_message WHERE queue_name = ? AND popped = false";
             try (Query q = new Query(objectMapper, c, UNPOPPED)) {
                 long count = q.addParameter(queueName).executeCount();
-                assertEquals("Remaining queue size mismatch", expectedSize, count);
+                assertEquals(expectedSize, count, "Remaining queue size mismatch");
             }
         } catch (Exception ex) {
             fail(ex.getMessage());
@@ -326,7 +331,7 @@ public class PostgresQueueDAOTest {
     }
 
     @Test
-    public void processUnacksTest() {
+    void processUnacksTest() {
         processUnacks(
                 () -> {
                     // Process unacks
@@ -336,7 +341,7 @@ public class PostgresQueueDAOTest {
     }
 
     @Test
-    public void processAllUnacksTest() {
+    void processAllUnacksTest() {
         processUnacks(
                 () -> {
                     // Process all unacks
@@ -392,14 +397,14 @@ public class PostgresQueueDAOTest {
         uacked = details.get(queueName).get("a").get("uacked");
         assertNotNull(uacked);
         assertEquals(
-                "The messages that were polled should be unacked still",
                 uacked.longValue(),
-                unackedCount - 1);
+                unackedCount - 1,
+                "The messages that were polled should be unacked still");
 
         Long otherUacked = details.get(otherQueueName).get("a").get("uacked");
         assertNotNull(otherUacked);
         assertEquals(
-                "Other queue should have all unacked messages", otherUacked.longValue(), count);
+                otherUacked.longValue(), count, "Other queue should have all unacked messages");
 
         Long size = queueDAO.queuesDetail().get(queueName);
         assertNotNull(size);

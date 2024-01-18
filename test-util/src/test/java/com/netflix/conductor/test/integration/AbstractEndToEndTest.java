@@ -26,9 +26,9 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestPropertySource;
@@ -42,9 +42,9 @@ import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
 import com.netflix.conductor.common.run.Workflow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestPropertySource(
         properties = {"conductor.indexing.enabled=true", "conductor.elasticsearch.version=6"})
@@ -76,7 +76,7 @@ public abstract class AbstractEndToEndTest {
         log.info("Initialized Elasticsearch {}", container.getContainerId());
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void initializeEs() {
         String httpHostAddress = container.getHttpHostAddress();
         String host = httpHostAddress.split(":")[0];
@@ -86,7 +86,7 @@ public abstract class AbstractEndToEndTest {
         restClient = restClientBuilder.build();
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanupEs() throws Exception {
         // deletes all indices
         Response beforeResponse = restClient.performRequest(new Request("GET", "/_cat/indices"));
@@ -107,7 +107,7 @@ public abstract class AbstractEndToEndTest {
     }
 
     @Test
-    public void testEphemeralWorkflowsWithStoredTasks() {
+    public void ephemeralWorkflowsWithStoredTasks() {
         String workflowExecutionName = "testEphemeralWorkflow";
 
         createAndRegisterTaskDefinitions("storedTaskDef", 5);
@@ -126,7 +126,7 @@ public abstract class AbstractEndToEndTest {
     }
 
     @Test
-    public void testEphemeralWorkflowsWithEphemeralTasks() {
+    public void ephemeralWorkflowsWithEphemeralTasks() {
         String workflowExecutionName = "ephemeralWorkflowWithEphemeralTasks";
 
         WorkflowDef workflowDefinition = createWorkflowDefinition(workflowExecutionName);
@@ -155,7 +155,7 @@ public abstract class AbstractEndToEndTest {
     }
 
     @Test
-    public void testEphemeralWorkflowsWithEphemeralAndStoredTasks() {
+    public void ephemeralWorkflowsWithEphemeralAndStoredTasks() {
         createAndRegisterTaskDefinitions("storedTask", 1);
 
         WorkflowDef workflowDefinition =
@@ -190,7 +190,7 @@ public abstract class AbstractEndToEndTest {
     }
 
     @Test
-    public void testEventHandler() {
+    public void eventHandler() {
         String eventName = "conductor:test_workflow:complete_task_with_event";
         EventHandler eventHandler = new EventHandler();
         eventHandler.setName("test_complete_task_event");

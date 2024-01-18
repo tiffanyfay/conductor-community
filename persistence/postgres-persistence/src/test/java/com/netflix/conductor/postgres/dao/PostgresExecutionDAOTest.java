@@ -14,8 +14,8 @@ package com.netflix.conductor.postgres.dao;
 import java.util.List;
 
 import org.flywaydb.core.Flyway;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,8 @@ import com.netflix.conductor.postgres.config.PostgresConfiguration;
 
 import com.google.common.collect.Iterables;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ContextConfiguration(
         classes = {
@@ -51,14 +51,14 @@ public class PostgresExecutionDAOTest extends ExecutionDAOTest {
     @Autowired Flyway flyway;
 
     // clean the database between tests.
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         flyway.clean();
         flyway.migrate();
     }
 
     @Test
-    public void testPendingByCorrelationId() {
+    void pendingByCorrelationId() {
 
         WorkflowDef def = new WorkflowDef();
         def.setName("pending_count_correlation_jtest");
@@ -77,7 +77,7 @@ public class PostgresExecutionDAOTest extends ExecutionDAOTest {
     }
 
     @Test
-    public void testRemoveWorkflow() {
+    void removeWorkflow() {
         WorkflowDef def = new WorkflowDef();
         def.setName("workflow");
 
@@ -92,7 +92,7 @@ public class PostgresExecutionDAOTest extends ExecutionDAOTest {
     }
 
     @Test
-    public void testRemoveWorkflowWithExpiry() {
+    void removeWorkflowWithExpiry() {
         WorkflowDef def = new WorkflowDef();
         def.setName("workflow");
 

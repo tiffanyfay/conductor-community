@@ -11,6 +11,7 @@
  */
 package com.netflix.conductor.postgres.dao;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flywaydb.core.Flyway;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
@@ -40,11 +40,11 @@ import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.core.exception.NonTransientException;
 import com.netflix.conductor.postgres.config.PostgresConfiguration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(
         classes = {
@@ -58,19 +58,23 @@ public class PostgresMetadataDAOTest {
 
     @Autowired private PostgresMetadataDAO metadataDAO;
 
-    @Rule public TestName name = new TestName();
+     public String name;
 
     @Autowired Flyway flyway;
 
     // clean the database between tests.
-    @Before
-    public void before() {
+    @BeforeEach
+    void before(TestInfo testInfo) {
+        Optional<Method> testMethod = testInfo.getTestMethod();
+        if (testMethod.isPresent()) {
+            this.name = testMethod.get().getName();
+        }
         flyway.clean();
         flyway.migrate();
     }
 
     @Test
-    public void testDuplicateWorkflowDef() {
+    void duplicateWorkflowDef() {
         WorkflowDef def = new WorkflowDef();
         def.setName("testDuplicate");
         def.setVersion(1);
@@ -84,7 +88,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testRemoveNotExistingWorkflowDef() {
+    void removeNotExistingWorkflowDef() {
         NonTransientException applicationException =
                 assertThrows(
                         NonTransientException.class,
@@ -94,7 +98,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testWorkflowDefOperations() {
+    void workflowDefOperations() {
         WorkflowDef def = new WorkflowDef();
         def.setName("test");
         def.setVersion(1);
@@ -179,7 +183,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testTaskDefOperations() {
+    void taskDefOperations() {
         TaskDef def = new TaskDef("taskA");
         def.setDescription("description");
         def.setCreatedBy("unit_test");
@@ -232,7 +236,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testRemoveNotExistingTaskDef() {
+    void removeNotExistingTaskDef() {
         NonTransientException applicationException =
                 assertThrows(
                         NonTransientException.class,
@@ -241,7 +245,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testEventHandlers() {
+    void eventHandlers() {
         String event1 = "SQS::arn:account090:sqstest1";
         String event2 = "SQS::arn:account090:sqstest2";
 
@@ -284,7 +288,7 @@ public class PostgresMetadataDAOTest {
     }
 
     @Test
-    public void testGetAllWorkflowDefsLatestVersions() {
+    void getAllWorkflowDefsLatestVersions() {
         WorkflowDef def = new WorkflowDef();
         def.setName("test1");
         def.setVersion(1);
