@@ -13,8 +13,8 @@ package com.netflix.conductor.contribs.queue.amqp;
 
 import java.time.Duration;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.netflix.conductor.contribs.queue.amqp.config.AMQPEventQueueProperties;
 import com.netflix.conductor.contribs.queue.amqp.util.AMQPSettings;
@@ -22,9 +22,10 @@ import com.netflix.conductor.contribs.queue.amqp.util.AMQPSettings;
 import com.rabbitmq.client.AMQP.PROTOCOL;
 import com.rabbitmq.client.ConnectionFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +33,7 @@ public class AMQPSettingsTest {
 
     private AMQPEventQueueProperties properties;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         properties = mock(AMQPEventQueueProperties.class);
         when(properties.getBatchSize()).thenReturn(1);
@@ -78,11 +79,13 @@ public class AMQPSettingsTest {
         assertEquals("myQueueName", settings.getQueueOrExchangeName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAMQPSettings_exchange_fromuri_wrongdeliverymode() {
-        String exchangestring =
-                "amqp_exchange:myExchangeName?exchangeType=topic&routingKey=test&deliveryMode=3";
-        AMQPSettings settings = new AMQPSettings(properties);
-        settings.fromURI(exchangestring);
+        assertThrows(IllegalArgumentException.class, () -> {
+            String exchangestring =
+                            "amqp_exchange:myExchangeName?exchangeType=topic&routingKey=test&deliveryMode=3";
+            AMQPSettings settings = new AMQPSettings(properties);
+            settings.fromURI(exchangestring);
+        });
     }
 }

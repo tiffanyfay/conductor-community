@@ -14,10 +14,8 @@ package com.netflix.conductor.core.execution.mapper;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.tasks.TaskType;
@@ -29,7 +27,7 @@ import com.netflix.conductor.dao.MetadataDAO;
 import com.netflix.conductor.model.TaskModel;
 import com.netflix.conductor.model.WorkflowModel;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class KafkaPublishTaskMapperTest {
@@ -37,9 +35,7 @@ public class KafkaPublishTaskMapperTest {
     private IDGenerator idGenerator;
     private KafkaPublishTaskMapper kafkaTaskMapper;
 
-    @Rule public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() {
         ParametersUtils parametersUtils = mock(ParametersUtils.class);
         MetadataDAO metadataDAO = mock(MetadataDAO.class);
@@ -77,7 +73,7 @@ public class KafkaPublishTaskMapperTest {
 
         // Then
         assertEquals(1, mappedTasks.size());
-        assertEquals(TaskType.KAFKA_PUBLISH.name(), mappedTasks.get(0).getTaskType());
+        assertEquals(TaskType.KAFKA_PUBLISH.name(), mappedTasks.getFirst().getTaskType());
     }
 
     @Test
@@ -114,8 +110,8 @@ public class KafkaPublishTaskMapperTest {
 
         // Then
         assertEquals(1, mappedTasks.size());
-        assertEquals(TaskType.KAFKA_PUBLISH.name(), mappedTasks.get(0).getTaskType());
-        assertEquals(testExecutionNameSpace, mappedTasks.get(0).getExecutionNameSpace());
-        assertEquals(testIsolationGroupId, mappedTasks.get(0).getIsolationGroupId());
+        assertEquals(TaskType.KAFKA_PUBLISH.name(), mappedTasks.getFirst().getTaskType());
+        assertEquals(testExecutionNameSpace, mappedTasks.getFirst().getExecutionNameSpace());
+        assertEquals(testIsolationGroupId, mappedTasks.getFirst().getIsolationGroupId());
     }
 }

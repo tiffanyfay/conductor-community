@@ -14,8 +14,7 @@ package com.netflix.conductor.contribs.listener.archive;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PreDestroy;
-
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +51,10 @@ public class ArchivingWithTTLWorkflowStatusListener implements WorkflowStatusLis
                         });
         this.scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
         LOGGER.warn(
-                "Workflow removal with TTL is no longer supported, "
-                        + "when using this class, workflows will be removed immediately");
+                """
+                Workflow removal with TTL is no longer supported, \
+                when using this class, workflows will be removed immediately\
+                """);
     }
 
     @PreDestroy

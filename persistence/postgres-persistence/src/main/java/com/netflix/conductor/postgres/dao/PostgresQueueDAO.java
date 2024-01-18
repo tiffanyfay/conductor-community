@@ -18,9 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import jakarta.annotation.PreDestroy;
 import org.springframework.retry.support.RetryTemplate;
 
 import com.netflix.conductor.core.events.queue.Message;
@@ -225,10 +225,12 @@ public class PostgresQueueDAO extends PostgresBaseDAO implements QueueDAO {
     public Map<String, Map<String, Map<String, Long>>> queuesDetailVerbose() {
         // @formatter:off
         final String GET_QUEUES_DETAIL_VERBOSE =
-                "SELECT queue_name, \n"
-                        + "       (SELECT count(*) FROM queue_message WHERE popped = false AND queue_name = q.queue_name) AS size,\n"
-                        + "       (SELECT count(*) FROM queue_message WHERE popped = true AND queue_name = q.queue_name) AS uacked \n"
-                        + "FROM queue q FOR SHARE SKIP LOCKED";
+                """
+                SELECT queue_name,\s
+                       (SELECT count(*) FROM queue_message WHERE popped = false AND queue_name = q.queue_name) AS size,
+                       (SELECT count(*) FROM queue_message WHERE popped = true AND queue_name = q.queue_name) AS uacked\s
+                FROM queue q FOR SHARE SKIP LOCKED\
+                """;
         // @formatter:on
 
         return queryWithTransaction(
@@ -312,9 +314,9 @@ public class PostgresQueueDAO extends PostgresBaseDAO implements QueueDAO {
                         try {
                             final List<String> msgIds = queueMessageMap.get(queueName);
                             final String UPDATE_POPPED =
-                                    String.format(
-                                            "UPDATE queue_message SET popped = false WHERE queue_name = ? and message_id IN (%s)",
-                                            Query.generateInBindings(msgIds.size()));
+                                            
+                                                            "UPDATE queue_message SET popped = false WHERE queue_name = ? and message_id IN (%s)".formatted(
+                                                            Query.generateInBindings(msgIds.size()));
 
                             unacked =
                                     query(
@@ -349,8 +351,10 @@ public class PostgresQueueDAO extends PostgresBaseDAO implements QueueDAO {
     public boolean resetOffsetTime(String queueName, String messageId) {
         long offsetTimeInSecond = 0; // Reset to 0
         final String SET_OFFSET_TIME =
-                "UPDATE queue_message SET offset_time_seconds = ?, deliver_on = (current_timestamp + (? ||' seconds')::interval) \n"
-                        + "WHERE queue_name = ? AND message_id = ?";
+                """
+                UPDATE queue_message SET offset_time_seconds = ?, deliver_on = (current_timestamp + (? ||' seconds')::interval)\s
+                WHERE queue_name = ? AND message_id = ?\
+                """;
 
         return queryWithTransaction(
                 SET_OFFSET_TIME,

@@ -11,10 +11,11 @@
  */
 package com.netflix.conductor.es7.dao.query.parser.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Viren
@@ -32,12 +33,14 @@ public class TestComparisonOp extends AbstractParserTest {
         }
     }
 
-    @Test(expected = ParserException.class)
+    @Test
     public void testInvalidOp() throws Exception {
-        String test = "AND";
-        ComparisonOp name = new ComparisonOp(getInputStream(test));
-        String nameVal = name.getOperator();
-        assertNotNull(nameVal);
-        assertEquals(test, nameVal);
+        assertThrows(ParserException.class, () -> {
+            String test = "AND";
+            ComparisonOp name = new ComparisonOp(getInputStream(test));
+            String nameVal = name.getOperator();
+            assertNotNull(nameVal);
+            assertEquals(test, nameVal);
+        });
     }
 }

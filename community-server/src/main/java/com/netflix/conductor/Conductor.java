@@ -20,7 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 // Prevents from the datasource beans to be loaded, AS they are needed only for specific databases.
 // In case that SQL database is selected this class will be imported back in the appropriate
@@ -47,7 +47,7 @@ public class Conductor {
      */
     private static void loadExternalConfig() throws IOException {
         String configFile = System.getProperty("CONDUCTOR_CONFIG_FILE");
-        if (!StringUtils.isEmpty(configFile)) {
+        if (!ObjectUtils.isEmpty(configFile)) {
             FileSystemResource resource = new FileSystemResource(configFile);
             if (resource.exists()) {
                 Properties properties = new Properties();

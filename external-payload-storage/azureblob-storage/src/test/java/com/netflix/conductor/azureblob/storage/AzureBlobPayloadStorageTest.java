@@ -13,10 +13,8 @@ package com.netflix.conductor.azureblob.storage;
 
 import java.time.Duration;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.netflix.conductor.azureblob.config.AzureBlobProperties;
 import com.netflix.conductor.common.run.ExternalStorageLocation;
@@ -24,9 +22,9 @@ import com.netflix.conductor.common.utils.ExternalPayloadStorage;
 import com.netflix.conductor.core.exception.NonTransientException;
 import com.netflix.conductor.core.utils.IDGenerator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +34,7 @@ public class AzureBlobPayloadStorageTest {
 
     private IDGenerator idGenerator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         properties = mock(AzureBlobProperties.class);
         idGenerator = new IDGenerator();
@@ -55,12 +53,11 @@ public class AzureBlobPayloadStorageTest {
     private final String azuriteConnectionString =
             "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;EndpointSuffix=localhost";
 
-    @Rule public ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void testNoStorageAccount() {
-        expectedException.expect(NonTransientException.class);
-        new AzureBlobPayloadStorage(idGenerator, properties);
+        assertThrows(NonTransientException.class, () -> {
+            new AzureBlobPayloadStorage(idGenerator, properties);
+        });
     }
 
     @Test

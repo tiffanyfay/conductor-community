@@ -15,11 +15,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.netflix.conductor.client.grpc.EventClient;
 import com.netflix.conductor.client.grpc.MetadataClient;
@@ -41,11 +39,10 @@ import com.netflix.conductor.common.run.Workflow.WorkflowStatus;
 import com.netflix.conductor.common.run.WorkflowSummary;
 import com.netflix.conductor.test.integration.AbstractEndToEndTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(
         properties = {"conductor.grpc-server.enabled=true", "conductor.grpc-server.port=8092"})
 @TestPropertySource(locations = "classpath:application-integrationtest.properties")
@@ -148,7 +145,7 @@ public abstract class AbstractGrpcEndToEndTest extends AbstractEndToEndTest {
                 workflowClient.getRunningWorkflow(def.getName(), def.getVersion());
         assertNotNull(runningIds);
         assertEquals(1, runningIds.size());
-        assertEquals(workflowId, runningIds.get(0));
+        assertEquals(workflowId, runningIds.getFirst());
 
         List<Task> polled =
                 taskClient.batchPollTasksByTaskType("non existing task", "test", 1, 100);
@@ -158,8 +155,8 @@ public abstract class AbstractGrpcEndToEndTest extends AbstractEndToEndTest {
         polled = taskClient.batchPollTasksByTaskType(t0.getName(), "test", 1, 100);
         assertNotNull(polled);
         assertEquals(1, polled.size());
-        assertEquals(t0.getName(), polled.get(0).getTaskDefName());
-        Task task = polled.get(0);
+        assertEquals(t0.getName(), polled.getFirst().getTaskDefName());
+        Task task = polled.getFirst();
 
         task.getOutputData().put("key1", "value1");
         task.setStatus(Status.COMPLETED);
@@ -167,7 +164,7 @@ public abstract class AbstractGrpcEndToEndTest extends AbstractEndToEndTest {
 
         polled = taskClient.batchPollTasksByTaskType(t0.getName(), "test", 1, 100);
         assertNotNull(polled);
-        assertTrue(polled.toString(), polled.isEmpty());
+        assertTrue(polled.isEmpty(), polled.toString());
 
         workflow = workflowClient.getWorkflow(workflowId, true);
         assertNotNull(workflow);

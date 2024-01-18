@@ -11,10 +11,10 @@
  */
 package com.netflix.conductor.test.integration.grpc.mysql;
 
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.netflix.conductor.client.grpc.EventClient;
 import com.netflix.conductor.client.grpc.MetadataClient;
@@ -22,7 +22,7 @@ import com.netflix.conductor.client.grpc.TaskClient;
 import com.netflix.conductor.client.grpc.WorkflowClient;
 import com.netflix.conductor.test.integration.grpc.AbstractGrpcEndToEndTest;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(
         properties = {
             "conductor.db.type=mysql",
@@ -37,7 +37,7 @@ import com.netflix.conductor.test.integration.grpc.AbstractGrpcEndToEndTest;
         })
 public class MySQLGrpcEndToEndTest extends AbstractGrpcEndToEndTest {
 
-    @Before
+    @BeforeEach
     public void init() {
         taskClient = new TaskClient("localhost", 8094);
         workflowClient = new WorkflowClient("localhost", 8094);

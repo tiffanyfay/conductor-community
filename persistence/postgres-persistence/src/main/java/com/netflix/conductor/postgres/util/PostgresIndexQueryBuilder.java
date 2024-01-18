@@ -66,7 +66,7 @@ public class PostgresIndexQueryBuilder {
                 this.values = values;
                 this.operator = getOperator(conditionMatcher.group(2));
                 if (this.attribute.endsWith("_time")) {
-                    values.set(0, millisToUtc(values.get(0)));
+                    values.set(0, millisToUtc(values.getFirst()));
                 }
             }
         }
@@ -98,7 +98,6 @@ public class PostgresIndexQueryBuilder {
             if (values.size() > 1) {
                 q.addParameter(values);
             } else {
-                q.addParameter(values.get(0));
             }
         }
 

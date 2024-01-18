@@ -24,15 +24,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -40,11 +40,10 @@ import com.netflix.conductor.common.config.TestObjectMapperConfiguration;
 import com.netflix.conductor.common.utils.ExternalPayloadStorage;
 import com.netflix.conductor.core.utils.IDGenerator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@ContextConfiguration(classes = {TestObjectMapperConfiguration.class})
-@RunWith(SpringRunner.class)
+@SpringJUnitConfig(classes = {TestObjectMapperConfiguration.class})
 public class PostgresPayloadStorageTest {
 
     private PostgresPayloadTestUtil testPostgres;
@@ -53,8 +52,10 @@ public class PostgresPayloadStorageTest {
     public PostgreSQLContainer<?> postgreSQLContainer;
 
     private final String inputString =
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-                    + " Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.";
+            """
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry.\
+             Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.\
+            """;
     private final String errorMessage = "{\"Error\": \"Data does not exist.\"}";
     private final InputStream inputData;
     private final String key = "dummyKey.json";
@@ -63,7 +64,7 @@ public class PostgresPayloadStorageTest {
         inputData = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         postgreSQLContainer =
                 new PostgreSQLContainer<>(DockerImageName.parse("postgres"))
@@ -114,9 +115,10 @@ public class PostgresPayloadStorageTest {
         stmt.executeUpdate();
     }
 
-    @Test(timeout = 60 * 1000)
+    @Test
+    @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS)
     public void testMultithreadDownload()
-            throws ExecutionException, InterruptedException, SQLException, IOException {
+                    throws ExecutionException, InterruptedException, SQLException, IOException {
         AtomicInteger threadCounter = new AtomicInteger(0);
         insertData();
         int numberOfThread = 12;
@@ -189,9 +191,10 @@ public class PostgresPayloadStorageTest {
         assertCount(5);
     }
 
-    @Test(timeout = 60 * 1000)
+    @Test
+    @Timeout(value = 60 * 1000, unit = TimeUnit.MILLISECONDS)
     public void testMultithreadInsert()
-            throws SQLException, ExecutionException, InterruptedException {
+                    throws SQLException, ExecutionException, InterruptedException {
         AtomicInteger threadCounter = new AtomicInteger(0);
         int numberOfThread = 12;
         int taskInThread = 100;
@@ -292,7 +295,7 @@ public class PostgresPayloadStorageTest {
         }
     }
 
-    @After
+    @AfterEach
     public void teardown() throws SQLException {
         testPostgres.getDataSource().getConnection().close();
     }

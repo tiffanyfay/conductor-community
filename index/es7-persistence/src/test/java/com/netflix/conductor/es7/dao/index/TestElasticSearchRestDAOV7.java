@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.netflix.conductor.common.metadata.events.EventExecution;
 import com.netflix.conductor.common.metadata.events.EventHandler;
@@ -30,9 +30,9 @@ import com.netflix.conductor.es7.utils.TestUtils;
 
 import com.google.common.collect.ImmutableMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
@@ -68,22 +68,22 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
         String eventIndex =
                 INDEX_PREFIX + "_" + EVENT_DOC_TYPE + "_" + SIMPLE_DATE_FORMAT.format(new Date());
 
-        assertTrue("Index 'conductor_workflow' should exist", indexExists(workflowIndex));
-        assertTrue("Index 'conductor_task' should exist", indexExists(taskIndex));
+        assertTrue(indexExists(workflowIndex), "Index 'conductor_workflow' should exist");
+        assertTrue(indexExists(taskIndex), "Index 'conductor_task' should exist");
 
-        assertTrue("Index '" + taskLogIndex + "' should exist", indexExists(taskLogIndex));
-        assertTrue("Index '" + messageIndex + "' should exist", indexExists(messageIndex));
-        assertTrue("Index '" + eventIndex + "' should exist", indexExists(eventIndex));
+        assertTrue(indexExists(taskLogIndex), "Index '" + taskLogIndex + "' should exist");
+        assertTrue(indexExists(messageIndex), "Index '" + messageIndex + "' should exist");
+        assertTrue(indexExists(eventIndex), "Index '" + eventIndex + "' should exist");
 
         assertTrue(
-                "Index template for 'message' should exist",
-                indexDAO.doesResourceExist("/_template/template_" + MSG_DOC_TYPE));
+                indexDAO.doesResourceExist("/_template/template_" + MSG_DOC_TYPE),
+                "Index template for 'message' should exist");
         assertTrue(
-                "Index template for 'event' should exist",
-                indexDAO.doesResourceExist("/_template/template_" + EVENT_DOC_TYPE));
+                indexDAO.doesResourceExist("/_template/template_" + EVENT_DOC_TYPE),
+                "Index template for 'event' should exist");
         assertTrue(
-                "Index template for 'task_log' should exist",
-                indexDAO.doesResourceExist("/_template/template_" + LOG_DOC_TYPE));
+                indexDAO.doesResourceExist("/_template/template_" + LOG_DOC_TYPE),
+                "Index template for 'task_log' should exist");
     }
 
     @Test
@@ -119,7 +119,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         workflows = tryFindResults(() -> searchWorkflows(workflowSummary.getWorkflowId()), 0);
 
-        assertTrue("Workflow was not removed.", workflows.isEmpty());
+        assertTrue(workflows.isEmpty(), "Workflow was not removed.");
     }
 
     @Test
@@ -137,7 +137,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         workflows = tryFindResults(() -> searchWorkflows(workflowSummary.getWorkflowId()), 0);
 
-        assertTrue("Workflow was not removed.", workflows.isEmpty());
+        assertTrue(workflows.isEmpty(), "Workflow was not removed.");
     }
 
     @Test
@@ -178,7 +178,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         List<String> tasks = tryFindResults(() -> searchTasks(taskSummary));
 
-        assertEquals(taskSummary.getTaskId(), tasks.get(0));
+        assertEquals(taskSummary.getTaskId(), tasks.getFirst());
     }
 
     @Test
@@ -188,7 +188,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         List<String> tasks = tryFindResults(() -> searchTasks(taskSummary));
 
-        assertEquals(taskSummary.getTaskId(), tasks.get(0));
+        assertEquals(taskSummary.getTaskId(), tasks.getFirst());
     }
 
     @Test
@@ -212,7 +212,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         tasks = tryFindResults(() -> searchTasks(taskSummary), 0);
 
-        assertTrue("Task was not removed.", tasks.isEmpty());
+        assertTrue(tasks.isEmpty(), "Task was not removed.");
     }
 
     @Test
@@ -236,7 +236,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         tasks = tryFindResults(() -> searchTasks(taskSummary), 0);
 
-        assertTrue("Task was not removed.", tasks.isEmpty());
+        assertTrue(tasks.isEmpty(), "Task was not removed.");
     }
 
     @Test
@@ -251,7 +251,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         tasks = tryFindResults(() -> searchTasks(taskSummary), 0);
 
-        assertFalse("Task was removed.", tasks.isEmpty());
+        assertFalse(tasks.isEmpty(), "Task was removed.");
     }
 
     @Test
@@ -266,7 +266,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         tasks = tryFindResults(() -> searchTasks(taskSummary), 0);
 
-        assertFalse("Task was removed.", tasks.isEmpty());
+        assertFalse(tasks.isEmpty(), "Task was removed.");
     }
 
     @Test
@@ -284,7 +284,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         assertEquals(3, indexedLogs.size());
 
-        assertTrue("Not all logs was indexed", indexedLogs.containsAll(logs));
+        assertTrue(indexedLogs.containsAll(logs), "Not all logs was indexed");
     }
 
     @Test
@@ -302,7 +302,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
 
         assertEquals(3, indexedLogs.size());
 
-        assertTrue("Not all logs was indexed", indexedLogs.containsAll(logs));
+        assertTrue(indexedLogs.containsAll(logs), "Not all logs was indexed");
     }
 
     @Test
@@ -319,8 +319,8 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
         assertEquals(2, indexedMessages.size());
 
         assertTrue(
-                "Not all messages was indexed",
-                indexedMessages.containsAll(Arrays.asList(message1, message2)));
+                indexedMessages.containsAll(Arrays.asList(message1, message2)),
+                "Not all messages was indexed");
     }
 
     @Test
@@ -338,8 +338,8 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
         assertEquals(2, indexedExecutions.size());
 
         assertTrue(
-                "Not all event executions was indexed",
-                indexedExecutions.containsAll(Arrays.asList(execution1, execution2)));
+                indexedExecutions.containsAll(Arrays.asList(execution1, execution2)),
+                "Not all event executions was indexed");
     }
 
     @Test
@@ -357,8 +357,8 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
         assertEquals(2, indexedExecutions.size());
 
         assertTrue(
-                "Not all event executions was indexed",
-                indexedExecutions.containsAll(Arrays.asList(execution1, execution2)));
+                indexedExecutions.containsAll(Arrays.asList(execution1, execution2)),
+                "Not all event executions was indexed");
     }
 
     @Test
@@ -395,7 +395,7 @@ public class TestElasticSearchRestDAOV7 extends ElasticSearchRestDaoBaseTest {
         List<String> ids = indexDAO.searchRecentRunningWorkflows(2, 1);
 
         assertEquals(1, ids.size());
-        assertEquals(recentWorkflow.getWorkflowId(), ids.get(0));
+        assertEquals(recentWorkflow.getWorkflowId(), ids.getFirst());
     }
 
     @Test

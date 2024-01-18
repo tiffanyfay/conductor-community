@@ -21,9 +21,8 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -882,7 +881,7 @@ public class ElasticSearchRestDAOV7 extends ElasticSearchBaseDAO implements Inde
 
         SearchResult<String> taskSearchResult =
                 searchTasks(
-                        String.format("(taskId='%s') AND (workflowId='%s')", taskId, workflowId),
+                                "(taskId='%s') AND (workflowId='%s')".formatted(taskId, workflowId),
                         "*",
                         0,
                         1,

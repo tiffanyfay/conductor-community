@@ -13,9 +13,9 @@ package com.netflix.conductor.es7.dao.query.parser.internal;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Viren
@@ -55,10 +55,12 @@ public class TestConstValue extends AbstractParserTest {
         assertEquals(cv.getSysConstant(), ConstValue.SystemConsts.NOT_NULL);
     }
 
-    @Test(expected = ParserException.class)
+    @Test
     public void testInvalid() throws Exception {
-        String test = "'string value";
-        new ConstValue(getInputStream(test));
+        assertThrows(ParserException.class, () -> {
+            String test = "'string value";
+            new ConstValue(getInputStream(test));
+        });
     }
 
     @Test
@@ -82,10 +84,12 @@ public class TestConstValue extends AbstractParserTest {
         assertEquals("100", range.getHigh());
     }
 
-    @Test(expected = ParserException.class)
+    @Test
     public void testBadRange() throws Exception {
-        String test = "50 AND";
-        new Range(getInputStream(test));
+        assertThrows(ParserException.class, () -> {
+            String test = "50 AND";
+            new Range(getInputStream(test));
+        });
     }
 
     @Test
