@@ -61,9 +61,11 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
     public List<TaskModel> getPendingTasksByWorkflow(String taskDefName, String workflowId) {
         // @formatter:off
         String GET_IN_PROGRESS_TASKS_FOR_WORKFLOW =
-                "SELECT json_data FROM task_in_progress tip "
-                        + "INNER JOIN task t ON t.task_id = tip.task_id "
-                        + "WHERE task_def_name = ? AND workflow_id = ?";
+                """
+                SELECT json_data FROM task_in_progress tip \
+                INNER JOIN task t ON t.task_id = tip.task_id \
+                WHERE task_def_name = ? AND workflow_id = ?\
+                """;
         // @formatter:on
 
         return queryWithTransaction(
@@ -245,9 +247,11 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
         Preconditions.checkNotNull(taskName, "task name cannot be null");
         // @formatter:off
         String GET_IN_PROGRESS_TASKS_FOR_TYPE =
-                "SELECT json_data FROM task_in_progress tip "
-                        + "INNER JOIN task t ON t.task_id = tip.task_id "
-                        + "WHERE task_def_name = ?";
+                """
+                SELECT json_data FROM task_in_progress tip \
+                INNER JOIN task t ON t.task_id = tip.task_id \
+                WHERE task_def_name = ?\
+                """;
         // @formatter:on
 
         return queryWithTransaction(
@@ -400,8 +404,10 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
                 tx -> {
                     // @formatter:off
                     String GET_ALL_WORKFLOWS_FOR_WORKFLOW_DEF =
-                            "SELECT workflow_id FROM workflow_def_to_workflow "
-                                    + "WHERE workflow_def = ? AND date_str BETWEEN ? AND ?";
+                            """
+                            SELECT workflow_id FROM workflow_def_to_workflow \
+                            WHERE workflow_def = ? AND date_str BETWEEN ? AND ?\
+                            """;
                     // @formatter:on
 
                     List<String> workflowIds =
@@ -512,9 +518,9 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
             return executions;
         } catch (Exception e) {
             String message =
-                    String.format(
-                            "Unable to get event executions for eventHandlerName=%s, eventName=%s, messageId=%s",
-                            eventHandlerName, eventName, messageId);
+                            
+                                            "Unable to get event executions for eventHandlerName=%s, eventName=%s, messageId=%s".formatted(
+                                            eventHandlerName, eventName, messageId);
             throw new NonTransientException(message, e);
         }
     }
@@ -566,9 +572,9 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
         // Generate a formatted query string with a variable number of bind params based
         // on taskIds.size()
         final String GET_TASKS_FOR_IDS =
-                String.format(
-                        "SELECT json_data FROM task WHERE task_id IN (%s) AND json_data IS NOT NULL",
-                        Query.generateInBindings(taskIds.size()));
+                        
+                                        "SELECT json_data FROM task WHERE task_id IN (%s) AND json_data IS NOT NULL".formatted(
+                                        Query.generateInBindings(taskIds.size()));
 
         return query(
                 connection,
@@ -888,8 +894,10 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
 
     private void updateInProgressStatus(Connection connection, TaskModel task, boolean inProgress) {
         String UPDATE_IN_PROGRESS_TASK_STATUS =
-                "UPDATE task_in_progress SET in_progress_status = ?, modified_on = CURRENT_TIMESTAMP "
-                        + "WHERE task_def_name = ? AND task_id = ?";
+                """
+                UPDATE task_in_progress SET in_progress_status = ?, modified_on = CURRENT_TIMESTAMP \
+                WHERE task_def_name = ? AND task_id = ?\
+                """;
 
         execute(
                 connection,
@@ -904,8 +912,10 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
     private boolean insertEventExecution(Connection connection, EventExecution eventExecution) {
 
         String INSERT_EVENT_EXECUTION =
-                "INSERT INTO event_execution (event_handler_name, event_name, message_id, execution_id, json_data) "
-                        + "VALUES (?, ?, ?, ?, ?)";
+                """
+                INSERT INTO event_execution (event_handler_name, event_name, message_id, execution_id, json_data) \
+                VALUES (?, ?, ?, ?, ?)\
+                """;
         int count =
                 query(
                         connection,
@@ -923,13 +933,15 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
     private void updateEventExecution(Connection connection, EventExecution eventExecution) {
         // @formatter:off
         String UPDATE_EVENT_EXECUTION =
-                "UPDATE event_execution SET "
-                        + "json_data = ?, "
-                        + "modified_on = CURRENT_TIMESTAMP "
-                        + "WHERE event_handler_name = ? "
-                        + "AND event_name = ? "
-                        + "AND message_id = ? "
-                        + "AND execution_id = ?";
+                """
+                UPDATE event_execution SET \
+                json_data = ?, \
+                modified_on = CURRENT_TIMESTAMP \
+                WHERE event_handler_name = ? \
+                AND event_name = ? \
+                AND message_id = ? \
+                AND execution_id = ?\
+                """;
         // @formatter:on
 
         execute(
@@ -946,11 +958,13 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
 
     private void removeEventExecution(Connection connection, EventExecution eventExecution) {
         String REMOVE_EVENT_EXECUTION =
-                "DELETE FROM event_execution "
-                        + "WHERE event_handler_name = ? "
-                        + "AND event_name = ? "
-                        + "AND message_id = ? "
-                        + "AND execution_id = ?";
+                """
+                DELETE FROM event_execution \
+                WHERE event_handler_name = ? \
+                AND event_name = ? \
+                AND message_id = ? \
+                AND execution_id = ?\
+                """;
 
         execute(
                 connection,
@@ -971,11 +985,13 @@ public class MySQLExecutionDAO extends MySQLBaseDAO
             String executionId) {
         // @formatter:off
         String GET_EVENT_EXECUTION =
-                "SELECT json_data FROM event_execution "
-                        + "WHERE event_handler_name = ? "
-                        + "AND event_name = ? "
-                        + "AND message_id = ? "
-                        + "AND execution_id = ?";
+                """
+                SELECT json_data FROM event_execution \
+                WHERE event_handler_name = ? \
+                AND event_name = ? \
+                AND message_id = ? \
+                AND execution_id = ?\
+                """;
         // @formatter:on
         return query(
                 connection,

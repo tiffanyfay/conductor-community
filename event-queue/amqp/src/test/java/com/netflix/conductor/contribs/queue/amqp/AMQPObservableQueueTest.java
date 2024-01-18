@@ -400,7 +400,7 @@ public class AMQPObservableQueueTest {
         final String name = RandomStringUtils.randomAlphabetic(30),
                 type = "topic",
                 routingKey = RandomStringUtils.randomAlphabetic(30);
-        final String queueName = String.format("bound_to_%s", name);
+        final String queueName = "bound_to_%s".formatted(name);
 
         final AMQPSettings settings =
                 new AMQPSettings(properties)
@@ -495,7 +495,7 @@ public class AMQPObservableQueueTest {
         final String name = RandomStringUtils.randomAlphabetic(30),
                 type = "topic",
                 routingKey = RandomStringUtils.randomAlphabetic(30);
-        final String queueName = String.format("bound_to_%s", name);
+        final String queueName = "bound_to_%s".formatted(name);
 
         final AMQPSettings settings =
                 new AMQPSettings(properties)
