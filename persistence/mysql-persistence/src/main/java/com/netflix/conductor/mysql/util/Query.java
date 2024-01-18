@@ -435,7 +435,7 @@ public class Query implements AutoCloseable {
                 statement.close();
             }
         } catch (SQLException ex) {
-            logger.warn("Error closing prepared statement: {}", ex.getMessage());
+            logger.warn("Error closing prepared statement: {}", ex.getMessage(), ex);
         }
     }
 

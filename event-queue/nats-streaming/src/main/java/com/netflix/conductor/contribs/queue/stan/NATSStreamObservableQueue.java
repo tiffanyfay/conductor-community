@@ -59,10 +59,10 @@ public class NATSStreamObservableQueue extends NATSAbstractQueue {
     public void connect() {
         try {
             StreamingConnection temp = fact.createConnection();
-            LOGGER.info("Successfully connected for " + queueURI);
+            LOGGER.info("Successfully connected for {}", queueURI);
             conn = temp;
         } catch (Exception e) {
-            LOGGER.error("Unable to establish nats streaming connection for " + queueURI, e);
+            LOGGER.error("Unable to establish nats streaming connection for {}", queueURI, e);
             throw new RuntimeException(e);
         }
     }
@@ -100,9 +100,7 @@ public class NATSStreamObservableQueue extends NATSAbstractQueue {
                                 subscriptionOptions);
             }
         } catch (Exception ex) {
-            LOGGER.error(
-                    "Subscription failed with " + ex.getMessage() + " for queueURI " + queueURI,
-                    ex);
+            LOGGER.error("Subscription failed with {} for queueURI {}", ex.getMessage(), queueURI, ex);
         }
     }
 
@@ -118,7 +116,7 @@ public class NATSStreamObservableQueue extends NATSAbstractQueue {
             try {
                 subs.close(true);
             } catch (Exception ex) {
-                LOGGER.error("closeSubs failed with " + ex.getMessage() + " for " + queueURI, ex);
+                LOGGER.error("closeSubs failed with {} for {}", ex.getMessage(), queueURI, ex);
             }
             subs = null;
         }
@@ -130,7 +128,7 @@ public class NATSStreamObservableQueue extends NATSAbstractQueue {
             try {
                 conn.close();
             } catch (Exception ex) {
-                LOGGER.error("closeConn failed with " + ex.getMessage() + " for " + queueURI, ex);
+                LOGGER.error("closeConn failed with {} for {}", ex.getMessage(), queueURI, ex);
             }
             conn = null;
         }

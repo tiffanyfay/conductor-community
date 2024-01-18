@@ -256,7 +256,7 @@ public class ElasticSearchRestDAOV7 extends ElasticSearchBaseDAO implements Inde
         String template = "template_" + type;
         try {
             if (doesResourceNotExist("/_template/" + template)) {
-                logger.info("Creating the index template '" + template + "'");
+                logger.info("Creating the index template '{}'", template);
                 InputStream stream =
                         ElasticSearchRestDAOV7.class.getResourceAsStream("/" + template + ".json");
                 byte[] templateSource = IOUtils.toByteArray(stream);
@@ -273,7 +273,7 @@ public class ElasticSearchRestDAOV7 extends ElasticSearchBaseDAO implements Inde
                                         .getContent());
             }
         } catch (Exception e) {
-            logger.error("Failed to init " + template, e);
+            logger.error("Failed to init {}", template, e);
         }
     }
 
